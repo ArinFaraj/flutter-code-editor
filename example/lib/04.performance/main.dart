@@ -6,9 +6,11 @@
 // ignore_for_file: avoid_print
 
 import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
+
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/vs2015.dart';
+import 'package:flutter_prism/flutter_prism.dart';
 import 'package:highlight/languages/java.dart';
 
 const attempts = 5;
@@ -35,8 +37,15 @@ final spans = [
 final controllers = {
   'TextEditingController': TextEditingController(),
   'TextEditingController + colors': ColoredTextEditingController(),
-  'CodeController, no lang': CodeController(),
-  'CodeController, Java': CodeController(language: java),
+  'CodeController, no lang': CodeController(
+    prismLanguage: 'dart',
+    prismStyle: const PrismStyle.dark(),
+  ),
+  'CodeController, Java': CodeController(
+    language: java,
+    prismLanguage: 'java',
+    prismStyle: const PrismStyle.dark(),
+  ),
 };
 
 typedef FieldFactory = Widget Function({

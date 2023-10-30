@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_prism/flutter_prism.dart';
 import 'package:highlight/highlight_core.dart';
 import 'package:meta/meta.dart';
 
@@ -30,7 +31,6 @@ import 'actions/redo.dart';
 import 'actions/search.dart';
 import 'actions/undo.dart';
 import 'search_result_highlighted_builder.dart';
-import 'span_builder.dart';
 
 class CodeController extends TextEditingController {
   Mode? _language;
@@ -93,6 +93,7 @@ class CodeController extends TextEditingController {
   final bool readOnly;
 
   String get languageId => _languageId;
+  final String prismLanguage;
 
   Code _code;
 
@@ -101,7 +102,7 @@ class CodeController extends TextEditingController {
   late PopupController popupController;
   final autocompleter = Autocompleter();
   late final historyController = CodeHistoryController(codeController: this);
-
+  final PrismStyle prismStyle;
   @internal
   late final searchController = CodeSearchController(codeController: this);
 
@@ -119,7 +120,9 @@ class CodeController extends TextEditingController {
   /// requested by the widget and thus notifications are done right.
   @visibleForTesting
   TextSpan? lastTextSpan;
-
+  late final prism = Prism(
+    style: prismStyle,
+  );
   late final actions = <Type, Action<Intent>>{
     CommentUncommentIntent: CommentUncommentAction(controller: this),
     CopySelectionTextIntent: CopyAction(controller: this),
@@ -135,6 +138,8 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
+    required this.prismStyle,
+    required this.prismLanguage,
     AbstractAnalyzer analyzer = const DefaultLocalAnalyzer(),
     this.namedSectionParser,
     Set<String> readOnlySectionNames = const {},
@@ -890,16 +895,12 @@ class CodeController extends TextEditingController {
     required BuildContext context,
     TextStyle? style,
   }) {
-    // Return parsing
-    if (_language != null) {
-      return SpanBuilder(
-        code: _code,
-        theme: _getTheme(context),
-        rootStyle: style,
-      ).build();
-    }
+    return TextSpan(
+      style: style,
+      children: prism.render(text, prismLanguage),
+    );
 
-    return TextSpan(text: text, style: style);
+    // return TextSpan(text: text, style: style);
   }
 
   CodeThemeData _getTheme(BuildContext context) {

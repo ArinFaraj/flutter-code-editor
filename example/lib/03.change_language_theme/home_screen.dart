@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_prism/flutter_prism.dart';
 
 import '../common/snippets.dart';
 import '../common/themes.dart';
@@ -35,6 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late final _codeController = CodeController(
     language: builtinLanguages[_language],
     namedSectionParser: const BracketsStartEndNamedSectionParser(),
+    prismLanguage: 'dart',
+    prismStyle: const PrismStyle.dark(),
     text: dartSnippet,
   );
 
